@@ -1,0 +1,49 @@
+# https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md
+
+#组件信息
+component: scf
+name: bilibili_tool
+
+#组件参数配置
+inputs:
+  name: ${name}_scf
+  namespace: default
+  enableRoleAuth: false
+  src: ./bin/publish/
+  handler: index.main_handler
+  runtime: CustomRuntime
+  region: ap-guangzhou # 函数所在区域，默认广州
+  description: This is a function in ${app} application.
+  memorySize: 128
+  initTimeout: 30
+  timeout: 86400
+  asyncRunEnable: true
+  traceEnable: true
+  events: # 根据自己的需要修改
+    - timer: # 每日任务触发器
+        parameters:
+          name: DailyTask
+          cronExpression: "0 30 12 * * * *"
+          enable: true
+          argument: Daily
+    - timer: # 天选抽奖触发器
+        parameters:
+          name: LiveLotteryTask
+          cronExpression: "0 0 */4 * * * *"
+          enable: true
+          argument: LiveLottery
+    - timer: # 自动取关
+        parameters:
+          name: UnfollowBatchedTask
+          cronExpression: "0 0 0 * * MON *"
+          enable: false
+          argument: UnfollowBatched
+    - timer: # 大会员积分
+        parameters:
+          name: VipBigPointTask
+          cronExpression: "0 07 01 * * * *"
+          enable: true
+          argument: VipBigPoint
+  environment:
+    variables: # 根据自己的需要修改
+      Ray_BiliBiliCookies__1: buvid3=DBABF949-7614-A91D-26F0-12A0EEC5B4F476976infoc; b_nut=1668745376; i-wanna-go-back=-1; _uuid=1DE62D86-CADC-47E2-D33D-21012C8F7785378112infoc; buvid_fp_plain=undefined; rpdid=|(u)Y~ukJkkm0J'uYY)~RllRY; nostalgia_conf=-1; LIVE_BUVID=AUTO5716689082525895; buvid4=B897E9A6-9BFF-0EE5-135E-CC5E71EE8F2978120-022111812-d7P/UseiupbI1wRjax6YqA==; CURRENT_BLACKGAP=0; hit-new-style-dyn=0; hit-dyn-v2=1; b_ut=5; DedeUserID=1285554395; DedeUserID__ckMd5=106dfc99743ee479; is-2022-channel=1; CURRENT_FNVAL=4048; CURRENT_QUALITY=80; header_theme_version=CLOSE; CURRENT_PID=9dc03000-c8b4-11ed-aa7e-3b3a6b4a1857; FEED_LIVE_VERSION=V8; home_feed_column=5; fingerprint=56e8f3fca5961325408482d54ef784ac; buvid_fp=56e8f3fca5961325408482d54ef784ac; PVID=1; browser_resolution=1463-843; SESSDATA=02f41252,1698239299,4e4d9*42; bili_jct=836c43f8b8bf5114f1a7f7e77d95e7f8; b_lsid=7F6EBA510_187CAE7CCDC; sid=5hsmp4g0; innersign=0; bp_video_offset_1285554395=789837601151385600 # cookie，必填
